@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:on_audio_query/on_audio_query.dart';
 import '../../domain/entities/music.dart';
 import 'music_data_source.dart';
