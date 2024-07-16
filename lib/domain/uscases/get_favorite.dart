@@ -7,7 +7,7 @@ class GetFavorite{
 
   GetFavorite({required this.repository});
 
-  Future<List<Music>> call(Music music) async {
+  Future<List<Music>> call() async {
     return await repository.getFavoriteMusicList();
   }
 }
