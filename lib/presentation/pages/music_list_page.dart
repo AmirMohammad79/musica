@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../bloc/music_bloc.dart';
 import '../bloc/music_event.dart';
 import '../bloc/music_state.dart';
@@ -20,6 +21,27 @@ class MusicListPage extends StatelessWidget {
             return MusicListWidget(musicList: state.musicList);
           } else if (state is MusicError) {
             return Center(child: Text(state.message));
+          } else if (state is MusicPermissionDenied) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Required permissions denied'),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<MusicBloc>().add(RetryPermissionRequest());
+                    },
+                    child: Text('Retry'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await openAppSettings();
+                    },
+                    child: Text('Open App Settings'),
+                  ),
+                ],
+              ),
+            );
           }
           return Center(child: Text('Press the button to load music'));
         },

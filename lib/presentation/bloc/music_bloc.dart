@@ -1,6 +1,7 @@
+// lib/src/presentation/bloc/music_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/uscases/add_favorite_music.dart';
-import '../../domain/uscases/get_favorite.dart';
+import 'package:musica/domain/uscases/add_favorite_music.dart';
+import 'package:musica/domain/uscases/get_favorite.dart';
 import '../../domain/uscases/get_music_list.dart';
 import '../../domain/uscases/remove_favorite.dart';
 import '../../services/permission_service.dart';
@@ -9,7 +10,7 @@ import 'music_state.dart';
 
 class MusicBloc extends Bloc<MusicEvent, MusicState> {
   final GetMusicList getMusicList;
-  final AddFavoriteMusic addFavorite;
+  final AddFavorite addFavorite;
   final RemoveFavorite removeFavorite;
   final GetFavorite getFavoriteMusicList;
   final PermissionService permissionService;
@@ -20,36 +21,49 @@ class MusicBloc extends Bloc<MusicEvent, MusicState> {
     required this.removeFavorite,
     required this.getFavoriteMusicList,
     required this.permissionService,
-  }) : super(MusicInitial());
+  }) : super(MusicInitial()) {
+    on<LoadMusicList>(_onLoadMusicList);
+    on<AddToFavorite>(_onAddToFavorite);
+    on<RemoveFromFavorite>(_onRemoveFromFavorite);
+    on<LoadFavoriteMusicList>(_onLoadFavoriteMusicList);
+  }
 
-  Stream<MusicState> mapEventToState(MusicEvent event) async* {
-    if (event is LoadMusicList) {
-      yield MusicLoading();
-      final hasPermission = await permissionService.requestStoragePermission();
-      if (hasPermission) {
-        try {
-          final musicList = await getMusicList();
-          yield MusicLoaded(musicList);
-        } catch (e) {
-          yield MusicError(e.toString());
-        }
-      } else {
-        yield MusicError('Storage permission denied');
+  Future<void> _onLoadMusicList(LoadMusicList event, Emitter<MusicState> emit) async {
+    emit(MusicLoading());
+    final hasPermission = await permissionService.hasPermissions();
+    if (!hasPermission) {
+      final permissionGranted = await permissionService.requestPermissions();
+      if (!permissionGranted) {
+        emit(MusicError('Required permissions denied'));
+        return;
       }
-    } else if (event is AddToFavorite) {
-      await addFavorite(event.music);
-      yield FavoriteAdded();
-    } else if (event is RemoveFromFavorite) {
-      await removeFavorite(event.music);
-      yield FavoriteRemoved();
-    } else if (event is LoadFavoriteMusicList) {
-      yield MusicLoading();
-      try {
-        final favoriteMusicList = await getFavoriteMusicList();
-        yield FavoriteMusicLoaded(favoriteMusicList);
-      } catch (e) {
-        yield MusicError(e.toString());
-      }
+    }
+    try {
+      final musicList = await getMusicList();
+      emit(MusicLoaded(musicList));
+    } catch (e) {
+      emit(MusicError(e.toString()));
+    }
+  }
+
+  Future<void> _onAddToFavorite(AddToFavorite event, Emitter<MusicState> emit) async {
+    await addFavorite(event.music);
+    emit(FavoriteAdded());
+  }
+
+  Future<void> _onRemoveFromFavorite(RemoveFromFavorite event, Emitter<MusicState> emit) async {
+    await removeFavorite(event.music);
+    emit(FavoriteRemoved());
+  }
+
+  Future<void> _onLoadFavoriteMusicList(LoadFavoriteMusicList event, Emitter<MusicState> emit) async {
+    emit(MusicLoading());
+    try {
+      final favoriteMusicList = await getFavoriteMusicList();
+      emit(FavoriteMusicLoaded(favoriteMusicList));
+    } catch (e) {
+      emit(MusicError(e.toString()));
     }
   }
 }
+

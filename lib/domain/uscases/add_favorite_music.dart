@@ -1,15 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:musica/domain/repositories/music_repository.dart';
 
 import '../entities/music.dart';
 
-class AddFavoriteMusic{
-
+class AddFavorite {
   final MusicRepository repository;
 
-  AddFavoriteMusic({required this.repository});
+  AddFavorite({required this.repository});
 
   Future<void> call(Music music) async {
-
-    await repository.addFavorite(music);
+    return await repository.addFavorite(music);
   }
 }
