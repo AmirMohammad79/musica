@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 import '../../domain/entities/music.dart';
 import '../bloc/music_bloc.dart';
@@ -17,6 +18,11 @@ class MusicListWidget extends StatelessWidget {
       itemBuilder: (context, index) {
         final music = musicList[index];
         return ListTile(
+          leading: QueryArtworkWidget(
+            id: int.parse(music.id),
+            type: ArtworkType.AUDIO,
+            nullArtworkWidget: Icon(Icons.music_note),
+          ),
           title: Text(music.title),
           subtitle: Text(music.artist),
           trailing: IconButton(

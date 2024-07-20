@@ -26,6 +26,7 @@ class MusicBloc extends Bloc<MusicEvent, MusicState> {
     on<AddToFavorite>(_onAddToFavorite);
     on<RemoveFromFavorite>(_onRemoveFromFavorite);
     on<LoadFavoriteMusicList>(_onLoadFavoriteMusicList);
+    add(LoadMusicList()); // Trigger loading music list upon bloc creation
   }
 
   Future<void> _onLoadMusicList(LoadMusicList event, Emitter<MusicState> emit) async {

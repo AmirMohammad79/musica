@@ -21,36 +21,9 @@ class MusicListPage extends StatelessWidget {
             return MusicListWidget(musicList: state.musicList);
           } else if (state is MusicError) {
             return Center(child: Text(state.message));
-          } else if (state is MusicPermissionDenied) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Required permissions denied'),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<MusicBloc>().add(RetryPermissionRequest());
-                    },
-                    child: Text('Retry'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await openAppSettings();
-                    },
-                    child: Text('Open App Settings'),
-                  ),
-                ],
-              ),
-            );
           }
           return Center(child: Text('Press the button to load music'));
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<MusicBloc>().add(LoadMusicList());
-        },
-        child: Icon(Icons.refresh),
       ),
     );
   }
